@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HomeMenu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;800&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:        #0a0a0f;
+      --surface:   #111118;
+      --border:    #1e1e2e;
+      --accent:    #5c6ef8;
+      --accent2:   #a78bfa;
+      --glow:      rgba(92, 110, 248, 0.35);
+      --text:      #e2e2f0;
+      --muted:     #5a5a7a;
+      --danger:    #f87171;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      overflow: hidden;
+    }
+
+    /* ─── animated grid background ─── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(92,110,248,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(92,110,248,.04) 1px, transparent 1px);
+      background-size: 48px 48px;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse 70% 55% at 50% 40%, rgba(92,110,248,.12) 0%, transparent 70%);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .shell {
+      position: relative;
+      z-index: 1;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 40px;
+      padding: 40px 24px;
+    }
+
+    /* ─── header ─── */
+    header {
+      text-align: center;
+      animation: fadeDown .6s ease both;
+    }
+
+    header .label {
+      font-size: 11px;
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 8px;
+      font-family: 'DM Mono', monospace;
+    }
+
+    header h1 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(2.2rem, 5vw, 3.6rem);
+      line-height: 1;
+      background: linear-gradient(135deg, #fff 30%, var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -.02em;
+    }
+
+    /* ─── search bar ─── */
+    .search-wrap {
+      width: 100%;
+      max-width: 580px;
+      animation: fadeDown .6s .1s ease both;
+    }
+
+    .search-row {
+      display: flex;
+      gap: 8px;
+      align-items: stretch;
+    }
+
+    .search-row select {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      padding: 0 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      outline: none;
+      transition: border-color .2s;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%235a5a7a'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      padding-right: 28px;
+    }
+
+    .search-row select:focus { border-color: var(--accent); }
+
+    .search-row input {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-size: 14px;
+      padding: 14px 18px;
+      border-radius: 10px;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+      caret-color: var(--accent);
+    }
+
+    .search-row input::placeholder { color: var(--muted); }
+
+    .search-row input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--glow);
+    }
+
+    .search-row button.go-btn {
+      background: var(--accent);
+      border: none;
+      color: #fff;
+      font-family: 'Syne', sans-serif;
+      font-weight: 600;
+      font-size: 13px;
+      padding: 0 22px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: opacity .18s, transform .12s;
+      letter-spacing: .04em;
+    }
+
+    .search-row button.go-btn:hover { opacity: .88; transform: translateY(-1px); }
+    .search-row button.go-btn:active { transform: scale(.97); }
+
+    /* ─── section labels ─── */
+    .section-label {
+      font-size: 10px;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    /* ─── app grid ─── */
+    .apps-section {
+      width: 100%;
+      max-width: 580px;
+      animation: fadeDown .6s .2s ease both;
+    }
+
+    .apps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 12px;
+    }
+
+    .app-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px 16px 18px;
+      cursor: pointer;
+      transition: border-color .2s, transform .15s, box-shadow .2s, background .2s;
+      position: relative;
+      overflow: hidden;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .app-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+      opacity: 0;
+      transition: opacity .2s;
+    }
+
+    .app-btn:hover {
+      border-color: var(--accent);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 32px var(--glow);
+    }
+
+    .app-btn:hover::before { opacity: .08; }
+    .app-btn:active { transform: scale(.97) translateY(0); }
+
+    .app-btn .icon {
+      position: relative;
+      z-index: 1;
+      font-size: 32px;
+      line-height: 1;
+    }
+
+    .app-btn .app-name {
+      position: relative;
+      z-index: 1;
+      font-family: 'Syne', sans-serif;
+      font-weight: 600;
+      font-size: 12px;
+      letter-spacing: .01em;
+      text-align: center;
+    }
+
+    /* ─── status toast ─── */
+    #toast {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      color: var(--text);
+      font-size: 12px;
+      padding: 10px 20px;
+      border-radius: 8px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .25s, transform .25s;
+      white-space: nowrap;
+      z-index: 100;
+    }
+
+    #toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ─── time display ─── */
+    .time-display {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      color: var(--muted);
+      letter-spacing: .1em;
+      animation: fadeDown .6s .05s ease both;
+    }
+
+    /* ─── animations ─── */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── scrollbar ─── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  </style>
+</head>
+<body>
+
+<div class="shell">
+
+  <header>
+    <div class="label">// your machine</div>
+    <h1>HomeMenu</h1>
+  </header>
+
+  <div class="time-display" id="clock">--:-- --</div>
+
+  <!-- ─── Search ─── -->
+  <div class="search-wrap">
+    <div class="section-label" style="margin-bottom:10px;">Search the web</div>
+    <div class="search-row">
+      <select id="engine" title="Search engine">
+        <option value="google">Google</option>
+        <option value="bing">Bing</option>
+      </select>
+      <input
+        id="query"
+        type="text"
+        placeholder="Search or type a URL…"
+        autocomplete="off"
+        spellcheck="false"
+      />
+      <button class="go-btn" onclick="doSearch()">Go →</button>
+    </div>
+  </div>
+
+  <!-- ─── App Launchers ─── -->
+  <div class="apps-section">
+    <div class="section-label" style="margin-bottom:12px;">Launch apps</div>
+    <div class="apps-grid" id="appGrid">
+
+      <button class="app-btn" onclick="launchApp('launch-file-explorer.bat')">
+        <span class="icon">🗂️</span>
+        <span class="app-name">File Explorer</span>
+      </button>
+
+      <button class="app-btn" onclick="launchApp('launch-microsoft-edge.bat')">
+        <span class="icon">🌐</span>
+        <span class="app-name">Microsoft Edge</span>
+      </button>
+
+      <!-- Placeholder slots — add more .bat files and duplicate this pattern -->
+      <button class="app-btn" style="opacity:.4;cursor:not-allowed;" title="Add a .bat launcher to enable">
+        <span class="icon">➕</span>
+        <span class="app-name">Add App</span>
+      </button>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- Toast notification -->
+<div id="toast">Launching…</div>
+
+<script>
+  /* ── Clock ── */
+  function updateClock() {
+    const now  = new Date();
+    let h      = now.getHours();
+    const m    = String(now.getMinutes()).padStart(2, '0');
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    h = h % 12 || 12;
+    document.getElementById('clock').textContent = `${h}:${m} ${ampm}`;
+  }
+  updateClock();
+  setInterval(updateClock, 15000);
+
+  /* ── Toast ── */
+  function showToast(msg, color) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.style.borderLeftColor = color || 'var(--accent)';
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2400);
+  }
+
+  /* ── Launch .bat via forced download ── */
+  function launchApp(name) {
+    try {
+      const link = document.createElement('a');
+      link.href = 'launchers/' + name;
+      link.download = name;            // forces browser to download → Windows executes on open
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      showToast('⚡ Launching ' + name.replace('launch-', '').replace('.bat', '').replace(/-/g, ' '));
+    } catch (e) {
+      showToast('❌ Launch failed: ' + e.message, 'var(--danger)');
+    }
+  }
+
+  /* ── Search ── */
+  function doSearch() {
+    const raw     = document.getElementById('query').value.trim();
+    const engine  = document.getElementById('engine').value;
+    if (!raw) return;
+
+    // detect bare URL or full URL → open directly
+    const looksLikeUrl = /^(https?:\/\/|www\.)/i.test(raw) || /^[\w-]+\.[\w]{2,}(\/|$)/.test(raw);
+
+    let url;
+    if (looksLikeUrl) {
+      url = raw.startsWith('http') ? raw : 'https://' + raw;
+    } else if (engine === 'bing') {
+      url = 'https://www.bing.com/search?q=' + encodeURIComponent(raw);
+    } else {
+      url = 'https://www.google.com/search?q=' + encodeURIComponent(raw);
+    }
+
+    window.open(url, '_blank');
+  }
+
+  /* ── Enter key to search ── */
+  document.getElementById('query').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doSearch();
+  });
+</script>
+
+</body>
+</html>
