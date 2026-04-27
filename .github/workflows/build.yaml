@@ -19,32 +19,40 @@ jobs:
         with:
           node-version: 18
 
-      # ── 3. Install Nativefier ───────────────────────────────────────────────
-      - name: Install Nativefier
-        run: npm install -g nativefier
+      # ── 3. Install Nativefier + local static server ─────────────────────────
+      - name: Install tools
+        run: npm install -g nativefier serve
 
-      # ── 4. Package into a Windows EXE ──────────────────────────────────────
+      # ── 4. Serve HTML locally, then build EXE ───────────────────────────────
       #
-      #   --inject: injects extra files (the launchers folder) into the app
-      #   --internal-urls: keeps navigation inside the Nativefier window
-      #   Note: Nativefier wraps a LOCAL html file; we point it at the
-      #         home-menu.html using a file:// URL trick via --browserwindow-options
+      #   Nativefier requires a URL (not a local file path), so we spin up a
+      #   tiny static server in the background pointing at the repo root, then
+      #   pass http://localhost:3000/home-menu.html as the target URL.
       #
+      #   The --inject flags bundle the .bat launchers into the Electron app
+      #   under resources/app/launchers/ so the JS href paths still resolve.
+      #
+      - name: Start local server
+        shell: pwsh
+        run: |
+          Start-Process -NoNewWindow -FilePath "npx" -ArgumentList "serve", "-l", "3000", "."
+          Start-Sleep -Seconds 4   # give the server a moment to start
+
       - name: Build EXE
         shell: cmd
         run: |
           nativefier ^
+            "http://localhost:3000/home-menu.html" ^
+            dist ^
             --name "HomeMenu" ^
             --platform windows ^
             --arch x64 ^
-            --out dist ^
             --single-instance ^
             --disable-dev-tools ^
             --inject launchers/launch-file-explorer.bat ^
             --inject launchers/launch-microsoft-edge.bat ^
             --inject launchers/launch-notepad.bat ^
-            --inject launchers/launch-calculator.bat ^
-            "home-menu.html"
+            --inject launchers/launch-calculator.bat
 
       # ── 5. Locate and zip the output ────────────────────────────────────────
       - name: Zip output folder
