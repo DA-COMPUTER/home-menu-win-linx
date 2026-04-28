@@ -4,6 +4,10 @@ on:
   release:
     types: [created]
 
+# Allow both jobs to upload release assets
+permissions:
+  contents: write
+
 # ── Shared build logic lives in each job below ────────────────────────────────
 # Two jobs run in parallel:
 #   build-windows  →  HomeMenu-Windows-x64.zip   (.exe)
@@ -93,13 +97,15 @@ jobs:
 
       # Nativefier cross-compiles for arm64 from the ubuntu-latest x64 runner.
       # Wine is NOT needed for Linux targets.
-      # We do need some Electron build dependencies though.
+      # Package names changed in Ubuntu 24.04:
+      #   libasound2     → libasound2t64
+      #   libxss1        → removed (merged into libx11)
+      #   libgtk-3-dev   → not needed for headless cross-compile
       - name: Install Linux build dependencies
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends \
-            libgtk-3-dev libnotify-dev libnss3 libxss1 \
-            libasound2 libxtst6 xauth xvfb
+            libnotify-dev libnss3 libasound2t64 libxtst6 xauth xvfb
 
       - name: Start local static server
         run: |
