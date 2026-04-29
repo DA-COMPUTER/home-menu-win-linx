@@ -30,29 +30,14 @@ jobs:
         with:
           node-version: 18
 
-      - name: Install Nativefier and serve
-        run: npm install -g nativefier serve
-
-      - name: Start local static server
-        shell: pwsh
-        run: |
-          Start-Process -NoNewWindow -FilePath "npx" `
-            -ArgumentList "serve", "--no-clipboard", "-l", "3000", "."
-          $deadline = (Get-Date).AddSeconds(20)
-          do {
-            Start-Sleep -Milliseconds 500
-            try {
-              $r = Invoke-WebRequest -Uri "http://localhost:3000" -UseBasicParsing -ErrorAction Stop
-              Write-Host "Server up ($($r.StatusCode))"
-              break
-            } catch { Write-Host "Waiting…" }
-          } while ((Get-Date) -lt $deadline)
+      - name: Install Nativefier
+        run: npm install -g nativefier
 
       - name: Build Windows EXE
         shell: cmd
         run: |
           nativefier ^
-            "http://localhost:3000/home-menu.html" ^
+            "https://da-computer.github.io/home-menu-win-linx/home-menu.html" ^
             dist ^
             --name "HomeMenu" ^
             --platform windows ^
@@ -92,8 +77,8 @@ jobs:
         with:
           node-version: 18
 
-      - name: Install Nativefier and serve
-        run: npm install -g nativefier serve
+      - name: Install Nativefier
+        run: npm install -g nativefier
 
       # Nativefier cross-compiles for arm64 from the ubuntu-latest x64 runner.
       # Wine is NOT needed for Linux targets.
@@ -107,19 +92,10 @@ jobs:
           sudo apt-get install -y --no-install-recommends \
             libnotify-dev libnss3 libasound2t64 libxtst6 xauth xvfb
 
-      - name: Start local static server
-        run: |
-          npx serve --no-clipboard -l 3000 . &
-          # Poll until ready
-          for i in $(seq 1 20); do
-            curl -sf http://localhost:3000 > /dev/null && echo "Server up" && break
-            sleep 1
-          done
-
       - name: Build Linux arm64 app (Raspberry Pi)
         run: |
           nativefier \
-            "http://localhost:3000/home-menu.html" \
+            "https://da-computer.github.io/home-menu-win-linx/home-menu.html" \
             dist \
             --name "HomeMenu" \
             --platform linux \
